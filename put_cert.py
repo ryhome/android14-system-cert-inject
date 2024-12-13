@@ -11,7 +11,7 @@ CERTIFICATE_PATH = args.certificate_path
 
 if not CERTIFICATE_PATH:
     script_name = os.path.basename(__file__)
-    print(f"Error: Certificate path is required. Please provide it as an argument.\nExample: python {script_name} /path/to/certificate.pem")
+    print(f"Error: Certificate is required. Please provide it as an argument.\nExample: python {script_name} <cert_name>.0")
     exit(1)
 
 # Helper function to execute ADB commands
@@ -53,10 +53,10 @@ adb_command("shell mount -t tmpfs tmpfs /system/etc/security/cacerts", "Mounting
 adb_command("shell mv /data/local/tmp/tmp-ca-copy/* /system/etc/security/cacerts/", "Restoring original certificates")
 
 # Push the new certificate to the device
-adb_command(f"push {CERTIFICATE_PATH} /data/local/tmp/new-cert.pem", "Pushing new certificate to device")
+adb_command(f"push {CERTIFICATE_PATH} /data/local/tmp/{CERTIFICATE_PATH}", "Pushing new certificate to device")
 
 # Move the new certificate into the system certificates directory
-adb_command("shell mv /data/local/tmp/new-cert.pem /system/etc/security/cacerts/", "Moving new certificate into cert directory")
+adb_command(f"shell mv /data/local/tmp/{CERTIFICATE_PATH} /system/etc/security/cacerts/", "Moving new certificate into cert directory")
 
 # Update permissions and SELinux labels
 adb_command("shell chown root:root /system/etc/security/cacerts/*", "Updating certificate ownership")
